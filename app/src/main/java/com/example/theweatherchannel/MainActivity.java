@@ -18,7 +18,11 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -27,6 +31,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import static android.hardware.SensorManager.getAltitude;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -39,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private LocationListener locationListener;
     private String api;
-    private int test = 0;
+    private Button apiButton, sensorButton, stopSensorButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +54,32 @@ public class MainActivity extends AppCompatActivity {
         sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
         listener = new Listener(this);
         information = findViewById(R.id.information);
+        initializeButtons();
         getLongitudeLatitude();
-        getSensors();
-//        new FetchWeatherInformation().execute("api.openweathermap.org/data/2.5/weather?lat=35&lon=139");
+    }
+
+    public void initializeButtons(){
+        apiButton = findViewById(R.id.apiButton);
+        apiButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new FetchWeatherInformation().execute(api);
+            }
+        });
+        sensorButton = findViewById(R.id.sensorButton);
+        sensorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSensors();
+            }
+        });
+        stopSensorButton = findViewById(R.id.stopSensorButton);
+        stopSensorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                unregisterSensorListeners();
+            }
+        });
     }
 
     public void getLongitudeLatitude() {
@@ -63,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "onLocationChanged: " + latitude + " " + longitude);
                 api = "http://api.openweathermap.org/data/2.5/weather?lat="+latitude+"&lon="+longitude+"&units=metric&APPID=868caba3626811db78521241d52982a3";
                 Log.d(TAG, "onLocationChanged: " + api);
-                new FetchWeatherInformation().execute(api);
+
             }
 
             public void onProviderDisabled(String provider) { }
@@ -129,6 +158,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        unregisterSensorListeners();
+    }
+
+    public void unregisterSensorListeners(){
         if (tempPresent)
             sensorManager.unregisterListener(listener);
         if (humidityPresent)
@@ -175,10 +208,28 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(s);
 
             try{
-                String object = new JSONObject(s).getString("weather"); //array with general information
-                Log.d(TAG, "onPostExecute: Weather = " + object);
-                String obj2 = new JSONObject(s).getString("main");
-                Log.d(TAG, "onPostExecute: main = " + obj2);
+                String weather = new JSONObject(s).getString("weather"); //array with general information
+                Log.d(TAG, "onPostExecute: Weather = " + weather);
+
+                JSONArray array = new JSONArray(weather);
+                String mainWeather = array.getString(0);
+                Log.d(TAG, "onPostExecute: test = " + array);
+                Log.d(TAG, "onPostExecute: test2 = " + mainWeather);
+                String main = new JSONObject(mainWeather).getString("main");
+                String weatherDescription = new JSONObject(mainWeather).getString("description");
+                Log.d(TAG, "onPostExecute: mainweather = " + main);
+                Log.d(TAG, "onPostExecute: weatherdesc = " + weatherDescription);
+                String main1 = new JSONObject(s).getString("main");
+                String temperature = new JSONObject(main1).getString("temp");
+                String pressure = new JSONObject(main1).getString("pressure");
+                String humidity = new JSONObject(main1).getString("humidity");
+                String windspeed = new JSONObject(new JSONObject(s).getString("wind")).getString("speed");
+                float altitude = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, Float.valueOf(pressure));
+                Log.d(TAG, "onPostExecute: temp = " + temperature);
+                Log.d(TAG, "onPostExecute: pressure = " + pressure);
+                Log.d(TAG, "onPostExecute: wind = " + windspeed);
+                Log.d(TAG, "onPostExecute: humidity = " + humidity);
+                Log.d(TAG, "onPostExecute: Altitude = " + altitude);
             }catch(JSONException e){
                 Log.d(TAG, "onPostExecute: " + e.getMessage());
                 e.printStackTrace();

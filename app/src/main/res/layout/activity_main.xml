@@ -14,4 +14,22 @@
         android:layout_height="wrap_content"
         android:textAppearance="@android:style/TextAppearance.Large" />
 
+    <Button
+        android:id="@+id/apiButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fetch API-information"/>
+
+    <Button
+        android:id="@+id/sensorButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start sensors!"/>
+
+    <Button
+        android:id="@+id/stopSensorButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop sensors!"/>
+
 </LinearLayout>

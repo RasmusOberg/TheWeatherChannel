@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String alldiff;
                 String tempDiff = "";
-//                if(aTemp )
+//                if(aTemp ||)
                 if(sTemp == aTemp){
                     tempDiff += "Both show the same : " + sTemp + " C";
                 }else if(sTemp > aTemp){

@@ -31,6 +31,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
+
 import static android.hardware.SensorManager.getAltitude;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private SensorManager sensorManager;
     private SensorEventListener listener;
     private Sensor pressure, temp, humidity;
-    private boolean tempPresent, pressurePresent, humidityPresent;
+    private boolean tempPresent, pressurePresent, humidityPresent, sensorPressed, apiPressed;
     private double longitude, latitude;
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -70,12 +72,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 new FetchWeatherInformation().execute(api);
+                apiPressed = true;
             }
         });
         sensorButton = findViewById(R.id.sensorButton);
         sensorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                sensorPressed = true;
                 getSensors();
             }
         });
@@ -90,20 +94,63 @@ public class MainActivity extends AppCompatActivity {
         compare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String alldiff;
-                String tempDiff = "";
-//                if(aTemp ||)
-                if(sTemp == aTemp){
-                    tempDiff += "Both show the same : " + sTemp + " C";
-                }else if(sTemp > aTemp){
-                    double diff = sTemp - aTemp;
-                    tempDiff += "Sensor is showing " + diff + " higher than API";
-                }else{
-                    double diff = aTemp - sTemp;
-                    tempDiff += "API is showing " + diff + " higher than the sensor";
-                }
+                if(sensorPressed && apiPressed) {
+                    String tempDiff = compareTemps();
+                    String pressureDiff = comparePressure();
+                    String humidityDiff = compareHumidity();
+                    difference.setText(tempDiff + "\n" + pressureDiff + "\n" + humidityDiff);
+                }else
+                    Toast.makeText(getApplicationContext(), "Please fetch both API and sensor-values", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public String compareTemps(){
+        String tempDiff = "";
+        if(sTemp == aTemp) {
+            tempDiff += "Both show the same : " + sTemp + " C";
+        }else if(sTemp > aTemp) {
+            double diff = sTemp - aTemp;
+            DecimalFormat df = new DecimalFormat("#0.00");
+            tempDiff += "Sensor is showing " + df.format(diff) + " degrees higher than API";
+        }else{
+            double diff = aTemp - sTemp;
+            DecimalFormat df = new DecimalFormat("#0.00");
+            tempDiff += "API is showing " + df.format(diff) + " degrees higher than the sensor";
+        }
+        return tempDiff;
+    }
+
+    public String comparePressure(){
+        String pressureDiff = "";
+        if(sPressure == aPressure) {
+            pressureDiff += "Both show the same : " + sPressure + " hPa";
+        }else if(sPressure > aPressure) {
+            double diff = sPressure - aPressure;
+            DecimalFormat df = new DecimalFormat("#0.00");
+            pressureDiff += "Sensor is showing " + df.format(diff) + " hPa higher than API";
+        }else{
+            double diff = aPressure - sPressure;
+            DecimalFormat df = new DecimalFormat("#0.00");
+            pressureDiff += "API is showing " + df.format(diff) + " hPa higher than the sensor";
+        }
+        return pressureDiff;
+    }
+
+    public String compareHumidity(){
+        String humidityDiff = "";
+        if(sHumidity == aHumidity){
+            humidityDiff += "Both show the same : " + sHumidity + " %";
+        }else if(sHumidity > aHumidity) {
+            double diff = sHumidity - aHumidity;
+            DecimalFormat df = new DecimalFormat("#0.00");
+            humidityDiff += "Sensor is showing " + df.format(diff) + " % higher than API";
+        }else{
+            double diff = aHumidity - sHumidity;
+            DecimalFormat df = new DecimalFormat("#0.00");
+            humidityDiff += "API is showing " + df.format(diff) + " % higher than the sensor";
+        }
+        return humidityDiff;
     }
 
     public void getLongitudeLatitude() {

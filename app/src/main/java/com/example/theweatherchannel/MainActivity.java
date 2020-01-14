@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationListener locationListener;
     private String api;
     private Button apiButton, sensorButton, stopSensorButton;
+    private TextView apiPressure, apiTemp, apiHumidity, sensorPressure, sensorTemp, sensorHumidity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
             tempPresent = true;
             sensorManager.registerListener(listener, temp, SensorManager.SENSOR_DELAY_NORMAL);
         } else {
+            Toast.makeText(this, "Ambient Temperature-sensor not available.", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "onCreate: Ambient Temperature not available.");
             tempPresent = false;
         }
@@ -132,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
             humidityPresent = true;
             sensorManager.registerListener(listener, humidity, SensorManager.SENSOR_DELAY_NORMAL);
         } else {
+            Toast.makeText(this, "Relative Humidity-sensor not available.", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "onCreate: Relative Humidity Sensor not available.");
             humidityPresent = false;
         }
@@ -140,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
             pressure = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
             sensorManager.registerListener(listener, pressure, SensorManager.SENSOR_DELAY_NORMAL);
         } else {
+            Toast.makeText(this, "Pressure-sensor not available.", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "onCreate: Pressure Sensor not available.");
             pressurePresent = false;
         }

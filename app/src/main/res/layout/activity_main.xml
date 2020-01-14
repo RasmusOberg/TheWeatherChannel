@@ -32,4 +32,76 @@
         android:layout_height="wrap_content"
         android:text="Stop sensors!"/>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="API Values"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+        <TextView
+            android:text="Api Temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/apiTemp" />
+
+        <TextView
+            android:id="@+id/apiPressure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Api pressure" />
+
+        <TextView
+            android:id="@+id/apiHumidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Api Humidity" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sensor Values"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+        <TextView
+            android:text="Sensor Temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/sensorTemp" />
+
+        <TextView
+            android:id="@+id/sensorPressure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sensor pressure" />
+
+        <TextView
+            android:id="@+id/sensorHumdity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sensor humidity" />
+
+    </LinearLayout>
+
+    </LinearLayout>
+
+
+
 </LinearLayout>

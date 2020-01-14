@@ -21,19 +21,22 @@ public class Listener implements SensorEventListener {
         if(event.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE){
             temp = event.values[0] + " degrees Celsius";
             tempTime = String.valueOf(event.timestamp);
+            main.setTemp(temp, (double) event.values[0]);
         }
         if(event.sensor.getType() == Sensor.TYPE_RELATIVE_HUMIDITY){
             humidity = event.values[0] + " % humidity";
             humidityTime = String.valueOf(event.timestamp);
+            main.setHumidity(humidity, (double) event.values[0]);
         }
         if(event.sensor.getType()== Sensor.TYPE_PRESSURE){
             pressure = event.values[0] + " hPa";
             pressureTime = String.valueOf(event.timestamp);
+            main.setPressure(pressure, (double) event.values[0]);
         }
-        total = "\nTemperature  = " + temp + ", Timestamp: " + tempTime +
-                "\nHumidity = " + humidity + ", Timestamp: " +humidityTime +
-                "\nPressure  = " + pressure + ",Timestamp: " + pressureTime;
-        Log.d(TAG, "onSensorChanged: " + total);
+//        total = "\nTemperature  = " + temp + ", Timestamp: " + tempTime +
+//                "\nHumidity = " + humidity + ", Timestamp: " +humidityTime +
+//                "\nPressure  = " + pressure + ",Timestamp: " + pressureTime;
+//        Log.d(TAG, "onSensorChanged: " + total);
     }
 
     @Override

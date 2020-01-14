@@ -22,7 +22,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +31,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import static android.hardware.SensorManager.getAltitude;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,13 +39,13 @@ public class MainActivity extends AppCompatActivity {
     private SensorEventListener listener;
     private Sensor pressure, temp, humidity;
     private boolean tempPresent, pressurePresent, humidityPresent;
-    private TextView information;
     private double longitude, latitude;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private String api;
-    private Button apiButton, sensorButton, stopSensorButton;
-    private TextView apiPressure, apiTemp, apiHumidity, sensorPressure, sensorTemp, sensorHumidity;
+    private Button apiButton, sensorButton, stopSensorButton, compare;
+    private TextView apiPressure, apiTemp, apiHumidity, sensorPressure, sensorTemp, sensorHumidity, difference;
+    private double sTemp, aTemp, aPressure, sPressure, sHumidity, aHumidity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,12 +53,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
         listener = new Listener(this);
-        information = findViewById(R.id.information);
-        initializeButtons();
+        initializeComponents();
         getLongitudeLatitude();
     }
 
-    public void initializeButtons(){
+    public void initializeComponents(){
+        difference = findViewById(R.id.differences);
+        apiPressure = findViewById(R.id.apiPressure);
+        apiTemp = findViewById(R.id.apiTemp);
+        apiHumidity = findViewById(R.id.apiHumidity);
+        sensorHumidity = findViewById(R.id.sensorHumdity);
+        sensorPressure = findViewById(R.id.sensorPressure);
+        sensorTemp = findViewById(R.id.sensorTemp);
         apiButton = findViewById(R.id.apiButton);
         apiButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,6 +84,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 unregisterSensorListeners();
+            }
+        });
+        compare = findViewById(R.id.compare);
+        compare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String alldiff;
+                String tempDiff = "";
+//                if(aTemp )
+                if(sTemp == aTemp){
+                    tempDiff += "Both show the same : " + sTemp + " C";
+                }else if(sTemp > aTemp){
+                    double diff = sTemp - aTemp;
+                    tempDiff += "Sensor is showing " + diff + " higher than API";
+                }else{
+                    double diff = aTemp - sTemp;
+                    tempDiff += "API is showing " + diff + " higher than the sensor";
+                }
             }
         });
     }
@@ -175,9 +197,21 @@ public class MainActivity extends AppCompatActivity {
             sensorManager.unregisterListener(listener);
     }
 
-    public void setInformation(String text) {
-        information.setText(text);
+    public void setTemp(String string, double a){
+        sensorTemp.setText(string + " degrees C");
+        sTemp = a;
     }
+
+    public void setPressure(String string, double a){
+        sensorPressure.setText(string + " hPa");
+        sPressure = a;
+    }
+
+    public void setHumidity(String string, double a){
+        sensorHumidity.setText(string + " %");
+        sHumidity = a;
+    }
+
 
     private class FetchWeatherInformation extends AsyncTask<String, Void, String> {
         protected String doInBackground(String... urls) {
@@ -218,23 +252,29 @@ public class MainActivity extends AppCompatActivity {
 
                 JSONArray array = new JSONArray(weather);
                 String mainWeather = array.getString(0);
-                Log.d(TAG, "onPostExecute: test = " + array);
-                Log.d(TAG, "onPostExecute: test2 = " + mainWeather);
-                String main = new JSONObject(mainWeather).getString("main");
+//                Log.d(TAG, "onPostExecute: test = " + array);
+//                Log.d(TAG, "onPostExecute: test2 = " + mainWeather);
+//                String main = new JSONObject(mainWeather).getString("main");
                 String weatherDescription = new JSONObject(mainWeather).getString("description");
-                Log.d(TAG, "onPostExecute: mainweather = " + main);
-                Log.d(TAG, "onPostExecute: weatherdesc = " + weatherDescription);
+//                Log.d(TAG, "onPostExecute: mainweather = " + main);
+//                Log.d(TAG, "onPostExecute: weatherdesc = " + weatherDescription);
                 String main1 = new JSONObject(s).getString("main");
                 String temperature = new JSONObject(main1).getString("temp");
                 String pressure = new JSONObject(main1).getString("pressure");
                 String humidity = new JSONObject(main1).getString("humidity");
                 String windspeed = new JSONObject(new JSONObject(s).getString("wind")).getString("speed");
                 float altitude = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, Float.valueOf(pressure));
-                Log.d(TAG, "onPostExecute: temp = " + temperature);
-                Log.d(TAG, "onPostExecute: pressure = " + pressure);
-                Log.d(TAG, "onPostExecute: wind = " + windspeed);
+//                Log.d(TAG, "onPostExecute: temp = " + temperature);
+//                Log.d(TAG, "onPostExecute: pressure = " + pressure);
+//                Log.d(TAG, "onPostExecute: wind = " + windspeed);
                 Log.d(TAG, "onPostExecute: humidity = " + humidity);
-                Log.d(TAG, "onPostExecute: Altitude = " + altitude);
+//                Log.d(TAG, "onPostExecute: Altitude = " + altitude);
+                aTemp = Double.parseDouble(temperature);
+                aPressure = Double.parseDouble(pressure);
+                aHumidity = Double.parseDouble(humidity);
+                apiTemp.setText(temperature + " degrees C");
+                apiHumidity.setText(humidity + " %");
+                apiPressure.setText(pressure + " hPa");
             }catch(JSONException e){
                 Log.d(TAG, "onPostExecute: " + e.getMessage());
                 e.printStackTrace();
